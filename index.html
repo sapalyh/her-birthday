@@ -190,6 +190,7 @@
 </head>
 <body>
 
+<div class="label-bar">Design preview v3 — fill the wish box to unlock the button, then blow out the candles.</div>
 
 <div class="cake-screen" id="cakeScreen">
   <div class="eyebrow-soft">Happy birthday</div>
@@ -351,11 +352,11 @@
     repo: 'her-birthday',
     path: 'wisheofher.txt',
     branch: 'main',
-    token: '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'
+    token: '' // <- paste your NEW token between these quotes, nothing else
   };
 
   async function saveWish(wishText) {
-    if (!wishText || GITHUB_CONFIG.token === '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') return;
+    if (!wishText || !GITHUB_CONFIG.token) return;
     const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
     const timestamp = new Date().toLocaleString();
     const newEntry = `[${timestamp}] ${wishText}\n`;
