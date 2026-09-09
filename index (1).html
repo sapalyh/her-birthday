@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Preview v3 — Birthday Site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&family=Noto+Sans+Arabic&family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blush: #f5dde3;
+    --blush-deep: #ecc3ce;
+    --lavender: #ece3f3;
+    --peach: #fbe3cd;
+    --gold: #e3b567;
+    --cream: #fdf8f5;
+    --plum: #660033;
+    --plum-soft: #8c4a63;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--plum);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .label-bar {
+    background: var(--plum);
+    color: var(--cream);
+    text-align: center;
+    padding: 10px;
+    font-size: 0.82rem;
+  }
+  h1, .display { font-family: 'Quicksand', sans-serif; font-weight: 600; color: var(--plum); }
+
+  /* ===== CAKE SCREEN ===== */
+  .cake-screen {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+    background: linear-gradient(160deg, var(--cream) 0%, var(--blush) 55%, var(--lavender) 100%);
+    overflow: hidden;
+    transition: opacity 0.5s ease;
+  }
+  .cake-screen.fade-out { opacity: 0; pointer-events: none; }
+
+  .eyebrow-soft { font-size: 1rem; color: var(--plum-soft); margin-bottom: 6px; position: relative; z-index: 2; }
+  .cake-screen h1 { font-size: clamp(2.2rem, 6.5vw, 3.6rem); line-height: 1.1; position: relative; z-index: 2; margin-bottom: 10px; }
+  .cake-screen .sub { font-size: 1rem; color: var(--plum-soft); max-width: 420px; position: relative; z-index: 2; margin-bottom: 26px; }
+
+  .cake-scene { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+  .cake-illustration { width: 210px; height: 190px; }
+  .flame { transform-origin: center bottom; animation: flicker 1.4s infinite ease-in-out; }
+  @keyframes flicker { 0%,100% { transform: scaleY(1) rotate(-1deg);} 50% { transform: scaleY(1.15) rotate(1deg);} }
+  .flame.out { animation: none; opacity: 0; transition: opacity 0.4s ease; }
+
+  .wish-box {
+    width: 100%; max-width: 340px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1.5px solid var(--lavender-deep, #cbb8ea);
+    background: var(--white);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.98rem;
+    color: var(--plum);
+    resize: none;
+    min-height: 72px;
+    box-shadow: 0 6px 20px rgba(122,99,130,0.1);
+  }
+  .wish-box:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .wish-box::placeholder { color: #b7a5be; }
+
+  .btn {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem;
+    padding: 15px 34px; border: none; border-radius: 999px;
+    background: linear-gradient(135deg, var(--gold), var(--peach)); color: var(--plum);
+    box-shadow: 0 8px 24px rgba(227,181,103,0.35); cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.3s ease;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); }
+  .btn:focus-visible { outline: 3px solid var(--plum); outline-offset: 3px; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .helper-text { font-size: 0.85rem; color: var(--plum-soft); position: relative; z-index: 2; min-height: 20px; }
+
+  .confetti-piece {
+    position: absolute; top: -10px; width: 8px; height: 14px; opacity: 0.9;
+    border-radius: 2px; animation: fall linear forwards; z-index: 5;
+  }
+  @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+
+  /* ===== REVEAL SCREEN ===== */
+  .reveal-screen {
+    position: fixed; inset: 0;
+    background: var(--plum);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.8s ease;
+    z-index: 20;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .reveal-screen.show { opacity: 1; pointer-events: auto; }
+
+  .lang-layer-blur {
+    position: absolute; inset: 0;
+    display: flex; flex-wrap: wrap; align-content: center; justify-content: center;
+    gap: 18px 28px;
+    padding: 20px;
+    filter: blur(1px);
+    opacity: 0.65;
+  }
+  .lang-layer-blur span {
+    color: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    white-space: nowrap;
+  }
+
+  .lang-layer-sharp {
+    position: absolute; inset: 0;
+  }
+  .lang-layer-sharp span {
+    position: absolute;
+    color: var(--gold);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.35);
+    white-space: nowrap;
+    max-width: 40vw;
+  }
+  @media (max-width: 600px) {
+    .lang-layer-sharp span { max-width: 46vw; white-space: normal; text-align: center; }
+  }
+
+  .reveal-card {
+    position: relative; z-index: 3;
+    background: rgba(255,255,255,0.14);
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 24px;
+    padding: 36px 32px;
+    max-width: 380px;
+    width: 86%;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    color: var(--cream);
+  }
+  .reveal-card .display { font-size: 1.6rem; margin-bottom: 6px; color: #ffffff; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  .reveal-message {
+    margin-top: 18px;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.92);
+    font-style: italic;
+  }
+  .reveal-message-it {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.75);
+    font-style: italic;
+  }
+  .reveal-card .wish-echo {
+    margin-top: 16px;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.75);
+    font-style: italic;
+    border-top: 1px solid rgba(255,255,255,0.25);
+    padding-top: 14px;
+  }
+  .save-status {
+    display: none;
+  }
+  .wish-echo {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .lang-layer-blur span { font-size: 1.1rem !important; }
+    .lang-layer-sharp span { font-size: 1.3rem !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="label-bar">Design preview v3 — fill the wish box to unlock the button, then blow out the candles.</div>
+
+<div class="cake-screen" id="cakeScreen">
+  <div class="eyebrow-soft">Happy birthday</div>
+  <h1>Sonika</h1>
+  <p class="sub">जन्मदिनको शुभकामना</p>
+
+  <div class="cake-scene">
+    <svg class="cake-illustration" viewBox="0 0 200 190" xmlns="http://www.w3.org/2000/svg">
+      <!-- plate -->
+      <ellipse cx="100" cy="178" rx="70" ry="8" fill="#ff6fa0" opacity="0.4"/>
+      <!-- tier 3 (bottom) -->
+      <rect x="20" y="120" width="160" height="45" rx="14" fill="#ff5c96"/>
+      <rect x="20" y="112" width="160" height="14" rx="6" fill="#fff" opacity="0.6"/>
+      <!-- tier 2 (middle) -->
+      <rect x="42" y="80" width="116" height="40" rx="12" fill="#ffab3d"/>
+      <rect x="42" y="73" width="116" height="12" rx="5" fill="#fff" opacity="0.6"/>
+      <!-- tier 1 (top) -->
+      <rect x="64" y="46" width="72" height="34" rx="10" fill="#a970ff"/>
+      <rect x="64" y="40" width="72" height="10" rx="4" fill="#fff" opacity="0.6"/>
+      <!-- candles -->
+      <g class="flame-group">
+        <rect x="76" y="20" width="5" height="20" fill="#ffcc33"/>
+        <ellipse class="flame" cx="78.5" cy="18" rx="5.5" ry="8" fill="#ff7a1a"/>
+        <rect x="97" y="14" width="5" height="26" fill="#ffcc33"/>
+        <ellipse class="flame" cx="99.5" cy="12" rx="6" ry="9" fill="#ff7a1a"/>
+        <rect x="118" y="20" width="5" height="20" fill="#ffcc33"/>
+        <ellipse class="flame" cx="120.5" cy="18" rx="5.5" ry="8" fill="#ff7a1a"/>
+      </g>
+    </svg>
+
+    <textarea class="wish-box" id="wishInput" placeholder="Make a wish..." aria-label="Your birthday wish"></textarea>
+    <button class="btn" id="blowBtn" disabled>Blow out the candles 🎂</button>
+    <p class="helper-text" id="helperText">Write a wish to unlock the candles</p>
+  </div>
+</div>
+
+<div class="reveal-screen" id="revealScreen" aria-live="polite">
+  <div class="lang-layer-blur" id="blurLayer"></div>
+  <div class="lang-layer-sharp" id="sharpLayer"></div>
+  <div class="reveal-card">
+    <div class="display">Happy Birthday Sonika! 🎉</div>
+    <div class="reveal-message" id="revealMessage"></div>
+    <div class="reveal-message-it" id="revealMessageIt"></div>
+    <div class="save-status" id="saveStatus"></div>
+    <div class="wish-echo" id="wishEcho"></div>
+  </div>
+</div>
+
+<script>
+  const revealMessage = document.getElementById('revealMessage');
+  const revealMessageIt = document.getElementById('revealMessageIt');
+  // Message shown after the reveal — swap MESSAGE_OPTIONS[0] once you pick one
+  const MESSAGE_OPTIONS = {
+    warm: "Another year, another reason to celebrate you.\nMay love find you in every corner,\nand courage carry you toward every dream.\nHappy Birthday, Sonika — shine on.",
+    motivational: "Sonika, may this year bring you closer to every dream you chase.\nMay you be surrounded by love that lifts you up,\nand strength that carries you through the hard days.\nHappy Birthday — the best is still ahead.",
+    simple: "Wishing you a year full of love, laughter, and light.\nMay every challenge make you stronger,\nevery dream come a little closer,\nand every day remind you how loved you are."
+  };
+  const selectedMessage = MESSAGE_OPTIONS.simple; // <- change key to switch
+  const selectedMessageIt = "Ti auguro un anno pieno d'amore, risate e luce.\nChe ogni sfida ti renda più forte,\nche ogni sogno si avvicini un po' di più,\ne che ogni giorno ti ricordi quanto sei amata.";
+
+  const wishInput = document.getElementById('wishInput');
+  const blowBtn = document.getElementById('blowBtn');
+  const helperText = document.getElementById('helperText');
+  const cakeScreen = document.getElementById('cakeScreen');
+  const revealScreen = document.getElementById('revealScreen');
+  const wishEcho = document.getElementById('wishEcho');
+  const saveStatus = document.getElementById('saveStatus');
+  const flames = document.querySelectorAll('.flame');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- Unlock button only once wish is written ----
+  wishInput.addEventListener('input', () => {
+    const filled = wishInput.value.trim().length > 0;
+    blowBtn.disabled = !filled;
+    helperText.textContent = filled ? 'Ready when you are' : 'Write a wish to unlock the candles';
+  });
+
+  // ---- Language wall content ----
+  // Highlighted (sharp) languages — CONFIRM the Limbu line before going live.
+  const highlighted = [
+    { text: 'Happy Birthday Sonika!', lang: 'English' },
+    { text: 'जन्मदिनको शुभकामना Sonika!', lang: 'Nepali' },
+    { text: 'Buon Compleanno Sonika!', lang: 'Italian' },
+    { text: '[Limbu phrase — confirm] Sonika!', lang: 'Limbu' },
+    { text: 'عيد ميلاد سعيد Sonika!', lang: 'Arabic' }
+  ];
+  // Background (blurred) languages — decorative only
+  const background = [
+    'Joyeux anniversaire Sonika!', 'Alles Gute zum Geburtstag Sonika!', 'Feliz cumpleaños Sonika!',
+    'お誕生日おめでとう Sonika!', '生日快乐 Sonika!', '생일 축하합니다 Sonika!', 'Feliz aniversário Sonika!',
+    'С днём рождения Sonika!', 'जन्मदिन मुबारक हो Sonika!', 'Gefeliciteerd met je verjaardag Sonika!',
+    'Doğum günün kutlu olsun Sonika!', 'Chúc mừng sinh nhật Sonika!', 'สุขสันต์วันเกิด Sonika!',
+    'Heri ya kuzaliwa Sonika!', 'Χρόνια πολλά Sonika!', 'Wszystkiego najlepszego Sonika!',
+    'יום הולדת שמח Sonika!', 'Selamat ulang tahun Sonika!', 'Hyvää syntymäpäivää Sonika!', 'শুভ জন্মদিন Sonika!'
+  ];
+
+  function buildLangWalls() {
+    const blurLayer = document.getElementById('blurLayer');
+    const sharpLayer = document.getElementById('sharpLayer');
+
+    // Repeat + shuffle background phrases to fill the screen
+    const tiled = [...background, ...background, ...background].sort(() => Math.random() - 0.5);
+    tiled.forEach(phrase => {
+      const span = document.createElement('span');
+      span.textContent = phrase;
+      span.style.fontSize = (0.95 + Math.random() * 0.9) + 'rem';
+      span.style.transform = `rotate(${(Math.random() * 20 - 10).toFixed(1)}deg)`;
+      blurLayer.appendChild(span);
+    });
+
+    // Fixed corner/edge slots so these never sit under the center card
+    const slots = [
+      { top: '6%',  left: '5%'  },              // English — top-left
+      { top: '6%',  right: '5%' },              // Nepali — top-right
+      { top: '3%',  left: '50%', translateX: true }, // Arabic — top-center, above card
+      { bottom: '6%', left: '5%'  },            // Italian — bottom-left
+      { bottom: '6%', right: '5%' }             // Limbu — bottom-right
+    ];
+
+    highlighted.forEach((item, i) => {
+      const span = document.createElement('span');
+      span.textContent = item.text;
+      span.title = item.lang;
+      span.style.fontSize = (1.3 + Math.random() * 0.5) + 'rem';
+      const slot = slots[i];
+      Object.keys(slot).forEach(key => {
+        if (key !== 'translateX') span.style[key] = slot[key];
+      });
+      span.style.transform = slot.translateX
+        ? `translateX(-50%) rotate(${(Math.random() * 6 - 3).toFixed(1)}deg)`
+        : `rotate(${(Math.random() * 6 - 3).toFixed(1)}deg)`;
+      sharpLayer.appendChild(span);
+    });
+  }
+  buildLangWalls();
+
+  function launchConfetti() {
+    if (prefersReducedMotion) return;
+    const colors = ['#f4a9c4', '#e6dbf3', '#fbe3cd', '#e3b567'];
+    for (let i = 0; i < 50; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+      piece.style.animationDelay = (Math.random() * 0.3) + 's';
+      cakeScreen.appendChild(piece);
+      piece.addEventListener('animationend', () => piece.remove());
+    }
+  }
+
+  // ---- Saves the wish into your repo as wisheofher.txt ----
+  // 1. Generate a fine-grained token: github.com/settings/tokens -> Fine-grained tokens -> Generate new
+  //    - Repository access: Only select repositories -> her-birthday
+  //    - Permissions: Contents -> Read and write (only this one)
+  // 2. Paste it below. Revoke it from GitHub settings once the day is over.
+  const GITHUB_CONFIG = {
+    owner: 'sapalyh',
+    repo: 'her-birthday',
+    path: 'wisheofher.txt',
+    branch: 'main',
+    token: 'PASTE_YOUR_FINE_GRAINED_TOKEN_HERE'
+  };
+
+  async function saveWish(wishText) {
+    if (!wishText || GITHUB_CONFIG.token === 'PASTE_YOUR_FINE_GRAINED_TOKEN_HERE') return;
+    const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+    const timestamp = new Date().toLocaleString();
+    const newEntry = `[${timestamp}] ${wishText}\n`;
+
+    try {
+      let existingContent = '';
+      let sha = null;
+
+      const getRes = await fetch(`${apiUrl}?ref=${GITHUB_CONFIG.branch}`, {
+        headers: { Authorization: `Bearer ${GITHUB_CONFIG.token}` }
+      });
+
+      if (getRes.ok) {
+        const data = await getRes.json();
+        sha = data.sha;
+        existingContent = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+      } else if (getRes.status !== 404) {
+        throw new Error('Fetch failed: ' + getRes.status);
+      }
+
+      const updatedContent = existingContent + newEntry;
+      const encodedContent = btoa(unescape(encodeURIComponent(updatedContent)));
+
+      const putRes = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${GITHUB_CONFIG.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'New birthday wish',
+          content: encodedContent,
+          branch: GITHUB_CONFIG.branch,
+          ...(sha ? { sha } : {})
+        })
+      });
+
+      if (!putRes.ok) throw new Error('Save failed: ' + putRes.status);
+    } catch (err) {
+      // Fails silently on the UI — the celebration continues either way
+      console.error('Could not save wish to repo:', err);
+    }
+  }
+
+  blowBtn.addEventListener('click', async () => {
+    flames.forEach(f => f.classList.add('out'));
+    blowBtn.disabled = true;
+    launchConfetti();
+
+    const wishText = wishInput.value.trim();
+    revealMessage.innerHTML = selectedMessage.split('\n').join('<br>');
+    revealMessageIt.innerHTML = selectedMessageIt.split('\n').join('<br>');
+    await saveWish(wishText);
+
+    setTimeout(() => {
+      cakeScreen.classList.add('fade-out');
+      revealScreen.classList.add('show');
+    }, 700);
+  });
+</script>
+
+</body>
+</html>
